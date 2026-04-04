@@ -1,0 +1,143 @@
+{
+  "name": "AI Task Automation Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "task-input",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -304,
+        -160
+      ],
+      "id": "5220445d-668d-4587-bf42-d1cb8bcdb96f",
+      "name": "Webhook",
+      "webhookId": "641be0ae-6ff1-41aa-a237-5cca79ecf424"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=your_gemini_api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"You are a task planning assistant. Analyze the following task and return ONLY a valid JSON object with no extra text, no markdown, no code blocks. Just raw JSON.\\n\\nTask: {{ $json.body.task }}\\n\\nReturn this exact structure:\\n{\\n  \\\"task_name\\\": \\\"short title of the task\\\",\\n  \\\"summary\\\": \\\"2-3 sentence summary\\\",\\n  \\\"action_steps\\\": \\\"Step 1: ... | Step 2: ... | Step 3: ...\\\",\\n  \\\"priority\\\": \\\"High or Medium or Low\\\",\\n  \\\"time_estimate\\\": \\\"e.g. 3 hours or 2 days\\\"\\n}\"\n        }\n      ]\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -96,
+        -160
+      ],
+      "id": "dc920340-34ea-49ee-9f92-3fa647601120",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the raw text from Gemini's response\nconst rawText = items[0].json.candidates[0].content.parts[0].text;\n\n// Clean it - remove markdown code blocks if Gemini adds them\nconst cleaned = rawText\n  .replace(/```json/g, '')\n  .replace(/```/g, '')\n  .trim();\n\n// Parse into JSON object\nconst parsed = JSON.parse(cleaned);\n\n// Return as clean individual fields\nreturn [\n  {\n    json: {\n      task_name: parsed.task_name,\n      summary: parsed.summary,\n      action_steps: parsed.action_steps,\n      priority: parsed.priority,\n      time_estimate: parsed.time_estimate\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        -160
+      ],
+      "id": "3d0339ff-e973-4fb0-83a5-1f3454d8a241",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.notion.com/v1/pages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer your_notion_api_key"
+            },
+            {
+              "name": "Notion-Version",
+              "value": "2022-06-28"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"parent\": {\n    \"database_id\": \"your_notion_database_id\"\n  },\n  \"properties\": {\n    \"Task Name\": {\n      \"title\": [\n        {\n          \"text\": {\n            \"content\": \"{{ $json.task_name }}\"\n          }\n        }\n      ]\n    },\n    \"Summary\": {\n      \"rich_text\": [\n        {\n          \"text\": {\n            \"content\": \"{{ $json.summary }}\"\n          }\n        }\n      ]\n    },\n    \"Action Steps\": {\n      \"rich_text\": [\n        {\n          \"text\": {\n            \"content\": \"{{ $json.action_steps }}\"\n          }\n        }\n      ]\n    },\n    \"Priority\": {\n      \"select\": {\n        \"name\": \"{{ $json.priority }}\"\n      }\n    },\n    \"Time Estimate\": {\n      \"rich_text\": [\n        {\n          \"text\": {\n            \"content\": \"{{ $json.time_estimate }}\"\n          }\n        }\n      ]\n    },\n    \"Created At\": {\n      \"date\": {\n        \"start\": \"{{ $now.toISO() }}\"\n      }\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        240,
+        -160
+      ],
+      "id": "a0c51d45-bd94-45f7-9c1d-b6e3614ad0e8",
+      "name": "Send to Notion"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send to Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "aa248beb-f3ac-413d-aee3-e6a3edae1a08",
+  "meta": {
+    "instanceId": "d19dda0c21b6f8a0e0a2c6b2a2463af1d9db4e5049a412b4c06d4b0ccdf0acbf"
+  },
+  "id": "0AMrLip5HppGyQid",
+  "tags": []
+}
