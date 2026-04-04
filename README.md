@@ -186,7 +186,6 @@ MIT License — free to use and modify.
 
 ---
 
-## 👨‍💻 Author
 
 ## 👨‍💻 Author
 
