@@ -189,8 +189,8 @@ MIT License — free to use and modify.
 
 ## 👨‍💻 Author
 
-**Your Name**
-B.Tech AIML | Your College Name
+**G Bhavani Shanth**
+B.Tech AIML | Woxsen University
 
 [![GitHub](https://img.shields.io/badge/GitHub-bhavani-gbs-181717?style=flat-square&logo=github)](https://github.com/bhavani-gbs)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-bhavani-shanth-gottipalli-0077B5?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/bhavani-shanth-gottipalli/)
