@@ -1,4 +1,4 @@
-# 🤖 AI Task Automation Assistant
+#  AI Task Automation Assistant
 
 > Convert any task into structured output and store it in Notion — automatically.
 
@@ -6,7 +6,7 @@
 ![n8n](https://img.shields.io/badge/Automation-n8n-ff6d5a?style=flat-square)
 ![Gemini](https://img.shields.io/badge/AI-Gemini%202.5%20Flash-4285F4?style=flat-square)
 ![Notion](https://img.shields.io/badge/Storage-Notion-000000?style=flat-square)
-![Free](https://img.shields.io/badge/Cost-100%25%20Free-4ade80?style=flat-square)
+
 
 ---
 
